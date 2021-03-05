@@ -109,14 +109,30 @@ public class Board {
 		return true;
 	}
 
-//	public Board[] adjBoards() {
-//		int dimension = this.boardSize;
-//		Board[] ans;
-//		for(int[] r : this.board) { //for every row on board
-//
-//
-//		}
-//	}
+	/**
+	 *
+	 * @param thisBoard board whose adjacencies we will find
+	 * @return List of all boards one move away from current state
+	 */
+	public static List<Board> adjBoards(int[][] thisBoard) {
+		int bSize = thisBoard.length;
+		List<Board> ans = new ArrayList<>();
+
+		int rowIndex = 0;
+		for(int[] r : thisBoard) { //for every row on board
+			for(List<Integer> newRow : adjRows(r,bSize,1)) {// for every other row possible off this one
+				int[] newRowArray = newRow.stream().mapToInt(i->i).toArray(); //use streaming to make List<Integer> into int[]
+				int[][] b = Arrays.stream(thisBoard).map(int[]::clone).toArray(int[][]::new); //use streaming to make clone of original board
+				for(int j = 0; j < bSize; j++) { //for each value in the specified row (rowIndex)
+					b[rowIndex][j] = newRowArray[j]; //set to new row values
+				}
+				Board bObject = new Board(b, bSize);
+				ans.add(bObject);
+			}
+			rowIndex++;
+		}
+		return ans;
+	}
 
 	public static List<List<Integer>> adjRows(int[] row, int length, int weight) {
 		List<List<Integer>> ans = new ArrayList<>();

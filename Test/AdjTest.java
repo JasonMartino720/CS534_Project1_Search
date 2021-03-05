@@ -31,4 +31,22 @@ public class AdjTest {
         List<List<Integer>> ans = Arrays.asList(a, b, d, e, f, g, h);
         assertEquals(ans, Board.adjRows(exRow, exRow.length, 1));
     }
+
+    @Test
+    public void boardAdjTest1() {
+        int ansSize = 6;
+        assertEquals(ansSize, Board.adjBoards(ExampleBoards.exampleBoardZero).size());
+    }
+
+    @Test
+    public void boardAdjTest2() {
+        int ansSize = 12;
+        assertEquals(ansSize, Board.adjBoards(ExampleBoards.exampleBoardOne).size());
+    }
+
+    @Test
+    public void boardAdjTest3() {
+        int ansSize = 56;
+        assertEquals(ansSize, Board.adjBoards(ExampleBoards.exampleBoardThree).size());
+    }
 }
