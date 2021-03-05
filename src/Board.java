@@ -1,9 +1,12 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Board {
 
 	public int[][] board;
 	public int boardSize;
-	public int attackingQueens;
+	public int score = heuristic();
 
 	public Board(int n) { //generic board constructor
 
@@ -91,4 +94,48 @@ public class Board {
 		return attackingPairs;
 	}
 
+	/**
+	 * Verifies that board should have item in every row to work with
+	 * @return whether board is workable
+	 */
+	public boolean validBoard() {
+		for(int[] a : this.board) {
+			int sum = 0;
+			for(int i : a) {
+				sum += i;
+			}
+			if(sum > 0) return false;
+		}
+		return true;
+	}
+
+//	public Board[] adjBoards() {
+//		int dimension = this.boardSize;
+//		Board[] ans;
+//		for(int[] r : this.board) { //for every row on board
+//
+//
+//		}
+//	}
+
+	public static List<List<Integer>> adjRows(int[] row, int length, int weight) {
+		List<List<Integer>> ans = new ArrayList<>();
+
+		List<Integer> given = new ArrayList<>();//Step 1: Convert array to arrayList
+		for (int num : row) given.add(num);
+
+		int index = 0;
+		for (int i = 0; i < row.length; i++) {
+			//Step 2: Create List for every type of set possible
+			List<Integer> aRow = new ArrayList<>();
+			for (int j = 0; j < length; j++) {
+				if (j == index) { //Index indicates where value should be added
+					aRow.add(weight);
+				} else aRow.add(0);
+			}
+			index++;
+			if (!(aRow.equals(given))) ans.add(aRow);
+		}
+		return ans;
+	}
 }
