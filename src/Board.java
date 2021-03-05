@@ -5,30 +5,44 @@ public class Board {
 	public int boardSize;
 	public int attackingQueens;
 
-	public Board(int n) {
+	public Board(int n) { //generic board constructor
 
 		board = new int[n][n];
 		boardSize = n;
 	}
 
-	public int countAttacking() {
+	public Board(int[][] b, int n) { //constructor for importing pre-made board
+
+		board = b;
+		boardSize = n;
+	}
+
+	public int heuristic() {
 		return countRowAttack() + countDiagonalRight() + countDiagonalLeft();
 	}
 
+	/**
+	 * Checks for queens attacking each other on x and y axis
+	 * @return # of collisions detected
+	 */
 	public int countRowAttack() {
 		int attackingPairs = 0;
-		for (int i = 0; i < boardSize; i++) {
+		for (int i = 0; i < boardSize; i++) { //choose row to iterate thru
 			int queens = 0;
-			for (int j = 0; j < boardSize; j++) {
+			for (int j = 0; j < boardSize; j++) { //check each column in row for # of queens
 				if (board[i][j] > 0) {
 					queens++;
 				}
 			}
-				attackingPairs += ((queens * (queens - 1)) / 2);
+				attackingPairs += ((queens * (queens - 1)) / 2); //Calculate # of collisions detected
 		}
 		return attackingPairs;
 	}
 
+	/**
+	 * Counts collision on right diagonal
+	 * @return # of collisions detected
+	 */
 	public int countDiagonalRight() {
 		int attackingPairs = 0;
 
@@ -55,6 +69,10 @@ public class Board {
 		return attackingPairs;
 	}
 
+	/**
+	 * Counts collision on Left diagonal
+	 * @return # of collisions detected
+	 */
 	public int countDiagonalLeft() {
 		int attackingPairs = 0;
 		for (int k = 0; k <= 2 * (boardSize - 1); ++k) {
@@ -72,13 +90,5 @@ public class Board {
 
 		return attackingPairs;
 	}
-
-//	public int totalCost() {
-//
-//	}
-//
-//	public int moveCost() {
-//
-//	}
 
 }
