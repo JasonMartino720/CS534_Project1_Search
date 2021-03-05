@@ -1,0 +1,13 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Datasource local storage ignored files
+/../../../../../../../:\Users\geary\IdeaProjects\CS534\HW1\.idea/dataSources/
+/dataSources.local.xml
+/misc.xml
+/modules.xml
+/vcs.xml
+HW1.iml
+workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
