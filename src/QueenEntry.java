@@ -28,8 +28,8 @@ public class QueenEntry {
         return of(row, col, 0);
     }
 
-    public QueenEntry clone(QueenEntry queen) {
-        return queen;
+    public QueenEntry clone() {
+        return this;
     }
 
     public QueenEntry setPos(int row, int col) {
