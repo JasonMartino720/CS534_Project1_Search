@@ -6,7 +6,10 @@ public class HillClimbing {
 
     public static final int BoardSize = 8;
     public static final int NumQueens = BoardSize * 9 / 8;
-    public static final int maxAllowableResets = 10;
+    public static final int maxAllowableResets = 5;
+    public static double Tmp,StartingTmp = 10000;
+    public static final double TempDegradation = 0.5;
+    public static final double minAllowableTemp = 1;
 
     public static Board currentBoard, refBoard, bestBoard;
     public static int currentCost, lowestCost, thisLowestCost, startingCost;
@@ -15,6 +18,10 @@ public class HillClimbing {
     public static int calculateCost(Board board) {
         //Cost Function: 100 * # Attacking Queens + Total Movement Costs
         return ((board.findNumAttacks() * 100) + board.getAllMoveCost(refBoard));
+    }
+
+    public static double simulatedAnnealing(int curSol, int newSol, double T){
+        return Math.exp((curSol-newSol)/T);
     }
 
     public static Board nextBoard(Board board) {
@@ -28,21 +35,31 @@ public class HillClimbing {
         }
         Collections.shuffle(QueenIDs);
 
+
         //Iterate through shuffled queen list
         for (int queenID : QueenIDs) {
-            ArrayList<QueenEntry> subsetMoves = allMoves.get(queenID-1);
+            ArrayList<QueenEntry> subsetMoves = allMoves.get(queenID - 1);
 
             //Iterate through all possible moves for "queenID-th" queen
             for (QueenEntry i : subsetMoves) {
                 Board tmpBoard = board.moveAQueen(queenID, i);
-                if(calculateCost(tmpBoard) < boardCost) {
+                //If this board represents a lower cost accept it, if not accept it with some probability
+                if (calculateCost(tmpBoard) < boardCost){
+                    //System.out.println("Found Better " + Tmp);
+                    Tmp *= TempDegradation;
                     return tmpBoard;
                 }
-                else{
-                    //System.out.println("Not as Good");
+                else {
+                    if ((Math.random() < simulatedAnnealing(boardCost, calculateCost(tmpBoard), Tmp))&&(Tmp > minAllowableTemp)){
+                        //System.out.println("Took Backwards " + Tmp);
+                        Tmp *= TempDegradation;
+                        return tmpBoard;
+                    }
                 }
+
             }
         }
+        Tmp *= TempDegradation;
         //null is returned if no better move was discovered
         return null;
     }
@@ -79,7 +96,9 @@ public class HillClimbing {
             }
 
             if(i < maxAllowableResets){
+                //Reset if we're going to go through again
                 currentBoard = refBoard;
+                Tmp = StartingTmp;
             }
         }
         long end = System.nanoTime();
