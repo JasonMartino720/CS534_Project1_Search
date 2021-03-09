@@ -4,7 +4,7 @@ public class HillClimbing {
 
     public static Random rand;
 
-    public static final int BoardSize = 8;
+    public static final int BoardSize = 16;
     public static final int NumQueens = BoardSize * 9 / 8;
     public static final int maxAllowableResets = 5;
     public static double Tmp,StartingTmp = 10000;
@@ -38,7 +38,7 @@ public class HillClimbing {
 
         //Iterate through shuffled queen list
         for (int queenID : QueenIDs) {
-            ArrayList<QueenEntry> subsetMoves = allMoves.get(queenID - 1);
+            ArrayList<QueenEntry> subsetMoves = allMoves.get(queenID); // -1 HERE Before
 
             //Iterate through all possible moves for "queenID-th" queen
             for (QueenEntry i : subsetMoves) {
@@ -80,7 +80,7 @@ public class HillClimbing {
 
             while (true) {
                 if (nextBoard(currentBoard) != null) {
-                    //System.out.println(nextBoard(currentBoard));
+                    System.out.println(nextBoard(currentBoard));
                     currentBoard = nextBoard(currentBoard);
                 } else {
                     thisLowestCost = calculateCost(currentBoard);
