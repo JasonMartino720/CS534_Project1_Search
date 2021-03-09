@@ -1,10 +1,30 @@
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class Board {
-    public static int[] dx = {1, 1, 0, -1, -1, -1, 0, 1};
-    public static int[] dy = {0, 1, 1, 1, 0, -1, -1, -1};
+    //The first 2 of dx and dy are for moving vertically.
+    //dSize is used to limit the move mode.
+    public static int[] dx = {1,  -1, 0, 0};
+    public static int[] dy = {0,  0,  1, -1};
+
+    public enum MoveMode {
+        VERTICAL_ONLY, VERTICAL_AND_HORIZONTAL;
+    }
+
+    public int dSize = 2; //2 for VERTICAL_ONLY, 4 for VERTICAL_AND_HORIZONTAL,
+
+    public void setMoveMode(MoveMode m) {
+        if (m == MoveMode.VERTICAL_ONLY) {
+            dSize = 2;
+        } else if (m==MoveMode.VERTICAL_AND_HORIZONTAL) {
+            dSize = 4;
+        }
+    }
 
     public final int size;
     public final int numQueen;
@@ -101,12 +121,22 @@ public class Board {
 
     public static Board ofRandomBoard(int size, int numQueen) {
         int[] queenWeights = BoardUtil.randomWeightList(numQueen);
-        int[] flatBoard = new int[size*size];
-        for (int i=1; i<=numQueen; i++) {
-            flatBoard[i-1] = i;
+        int[][] board = new int[size][size];
+        Random rng = ThreadLocalRandom.current();
+        for (int i=0; i<size; i++) {
+            board[rng.nextInt(size)][i] = i+1;
         }
-        BoardUtil.randomShuffle(flatBoard);
-        return new Board(flatBoard, queenWeights);
+        for (int i=size; i<numQueen; i++) {
+            while (true) {
+                int ranx = rng.nextInt(size);
+                int rany = rng.nextInt(size);
+                if (board[ranx][rany] == 0) {
+                    board[ranx][rany] = i+1;
+                    break;
+                }
+            }
+        }
+        return new Board(board, queenWeights);
     }
 
     private boolean checkCoord(int row, int col) {
@@ -128,7 +158,7 @@ public class Board {
         int currentCol = queens.get(queenIndex).col();
         int weight = queens.get(queenIndex).weight();
         ArrayList<QueenEntry> out = new ArrayList<>();
-        for (int d = 0; d < 8; d++) {
+        for (int d = 0; d < dSize; d++) {
             for (int i = 1; i < size; i++) {
                 int moveRow = currentRow + i * dx[d];
                 int moveCol = currentCol + i * dy[d];
@@ -233,6 +263,14 @@ public class Board {
         return out;
     }
 
+    @Override
+    public String toString() {
+        return "Board{" +
+                "board=\n" + Arrays.stream(board).map(i->Arrays.toString(i)).collect(Collectors.joining("\n")) +
+                "\nqueens=" + queens.stream().map(i->i.toString()).collect(Collectors.joining("\n")) +
+                '}';
+    }
+
     public static void main(String[] args) {
         int[][] startboard = {
                 {1,0,0,0,0,0,0,0},
@@ -246,6 +284,38 @@ public class Board {
         };
         Board b = new Board(startboard, new int[9]);
         System.out.println(b.findNumAttacks());
+        Board rb = Board.ofRandomBoard(4, 4);
+        System.out.println(rb);
+        ArrayList<QueenEntry> moves = rb.allPossibleMovesForQueen(1);
+        System.out.println(moves.toString());
+        Board newb = rb.moveAQueen(1, moves.get(0));
+        System.out.println(newb);
+        
+ //       Board b2 = Board.ofRandomBoard(5, 5);
+ //       b2.printBoard();
+    }
+    
+    public void printBoard() {
+    	for (int[] i : board) {
+    		System.out.println(Arrays.toString(i));
+    	}System.out.println();
     }
 
+    
+    public List<Board> adjBoards() {
+		int bSize = board.length;
+		List<Board> ans = new ArrayList<>();
+		for (int i = 1; i < bSize +1; i++) {
+			ArrayList<QueenEntry> moves = this.allPossibleMovesForQueen(i);
+			for (QueenEntry qe : moves) {
+				ans.add(moveAQueen(i, qe));
+			}		
+		}
+		return ans;
+    }
 }
+
+	
+
+
+
