@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Board {
     //The first 2 of dx and dy are for moving vertically.
@@ -145,6 +146,7 @@ public class Board {
     //out[i] is the possible moves for ith queen.
     public ArrayList<ArrayList<QueenEntry>> allPossibleMoves() {
         ArrayList<ArrayList<QueenEntry>> out = new ArrayList<>();
+        out.add(null); // out[0] is meaningless.
         for (int i=1; i<=numQueen; i++) {
             out.add(allPossibleMovesForQueen(i));
         }
@@ -184,7 +186,6 @@ public class Board {
         return getSingleMoveCost(queens.get(queenIndex), newPos);
     }
 
-    //Single move must be valid move, not checked in this function.
     //the weight in 'to' is not used.
     public static int getSingleMoveCost(QueenEntry from, QueenEntry to) {
         int step = Math.max(Math.abs(to.row()- from.row()), Math.abs(to.col() - from.col()));
@@ -193,10 +194,7 @@ public class Board {
 
     //the weight in 'to' is not used.
     private static int getQueenEntireMoveCost(QueenEntry from, QueenEntry to) {
-        int dx = Math.abs(to.row() - from.row());
-        int dy = Math.abs(to.col() - from.col());
-        int diag = Math.min(dx, dy);
-        return diag + dx - diag + dy - diag;
+        return getSingleMoveCost(from, to);
     }
 
     //The total moving cost from ref board to this.
@@ -283,11 +281,11 @@ public class Board {
         };
         Board b = new Board(startboard, new int[9]);
         System.out.println(b.findNumAttacks());
-        Board rb = Board.ofRandomBoard(4, 4);
+        Board rb = Board.ofRandomBoard(4, 5);
         System.out.println(rb);
-        ArrayList<QueenEntry> moves = rb.allPossibleMovesForQueen(1);
-        System.out.println(moves.toString());
-        Board newb = rb.moveAQueen(1, moves.get(0));
+        var moves = rb.allPossibleMoves();
+        System.out.println(moves.get(1).toString());
+        Board newb = rb.moveAQueen(1, moves.get(1).get(1));
         System.out.println(newb);
     }
 
