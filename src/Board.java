@@ -118,39 +118,36 @@ public class Board {
 		int bSize = thisBoard.length;
 		List<Board> ans = new ArrayList<>();
 
-		int rowIndex = 0;
-		for(int[] r : thisBoard) { //for every row on board
-			for(List<Integer> newRow : adjRows(r,bSize,1)) {// for every other row possible off this one
-				int[] newRowArray = newRow.stream().mapToInt(i->i).toArray(); //use streaming to make List<Integer> into int[]
-				int[][] b = Arrays.stream(thisBoard).map(int[]::clone).toArray(int[][]::new); //use streaming to make clone of original board
-				for(int j = 0; j < bSize; j++) { //for each value in the specified row (rowIndex)
-					b[rowIndex][j] = newRowArray[j]; //set to new row values
-				}
-				Board bObject = new Board(b, bSize);
+		for(int colIndex = 0; colIndex < bSize; colIndex++) { //for every column on board
+			List<Integer> aCol = new ArrayList<>();
+			for(int r = 0; r < bSize; r++) aCol.add(thisBoard[r][colIndex]); //generate list of each item in column colIndex, populate it
+
+			for(List<Integer> newCol : adjCols(aCol,1)) {// for every other column possible off this one
+				int[][] boardCopy = Arrays.stream(thisBoard).map(int[]::clone).toArray(int[][]::new); //use streaming to make clone of original board
+				//int[] newRowArray = newCol.stream().mapToInt(i->i).toArray(); //use streaming to make List<Integer> into int[]
+
+				for(int j = 0; j < bSize; j++) boardCopy[j][colIndex] = newCol.get(j); //for each value in the specified column (colIndex), set to new row values
+
+				Board bObject = new Board(boardCopy, bSize);
 				ans.add(bObject);
 			}
-			rowIndex++;
 		}
 		return ans;
 	}
 
-	public static List<List<Integer>> adjRows(int[] row, int length, int weight) {
+	public static List<List<Integer>> adjCols(List<Integer> aCol, int weight) {
+		int bSize = aCol.size();
 		List<List<Integer>> ans = new ArrayList<>();
 
-		List<Integer> given = new ArrayList<>();//Step 1: Convert array to arrayList
-		for (int num : row) given.add(num);
-
 		int index = 0;
-		for (int i = 0; i < row.length; i++) {
-			//Step 2: Create List for every type of set possible
-			List<Integer> aRow = new ArrayList<>();
-			for (int j = 0; j < length; j++) {
-				if (j == index) { //Index indicates where value should be added
-					aRow.add(weight);
-				} else aRow.add(0);
+		for (int i = 0; i < bSize; i++) { //Step 2: Create List for every type of set possible
+			List<Integer> uniqueCol = new ArrayList<>();
+			for (int j = 0; j < bSize; j++) {
+				if (j == index) uniqueCol.add(weight);//Index indicates where value should be added
+				else uniqueCol.add(0);
 			}
 			index++;
-			if (!(aRow.equals(given))) ans.add(aRow);
+			if (!(uniqueCol.equals(aCol))) ans.add(uniqueCol);
 		}
 		return ans;
 	}

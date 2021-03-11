@@ -9,16 +9,17 @@ import java.util.List;
 public class AdjTest {
     @Test
     public void rowAdjTest1() {
-        int[] exRow = {0,0,1};
+        List<Integer> exRow = Arrays.asList(0,0,1);
+
         List<Integer> a = Arrays.asList(1, 0, 0);
         List<Integer> b = Arrays.asList(0, 1, 0);
         List<List<Integer>> ans = Arrays.asList(a, b);
-        assertEquals(ans, Board.adjRows(exRow, exRow.length, 1));
+        assertEquals(ans, Board.adjCols(exRow, 1));
     }
 
     @Test
     public void rowAdjTest2() {
-        int[] exRow = {0,0,1,0,0,0,0,0};
+        List<Integer> exRow = Arrays.asList(0,0,1,0,0,0,0,0);
         List<Integer> a = Arrays.asList(1, 0, 0, 0 ,0 ,0 ,0 ,0);
         List<Integer> b = Arrays.asList(0, 1, 0, 0 ,0 ,0 ,0 ,0);
         //List<Integer> c = Arrays.asList(0, 0, 1, 0 ,0 ,0 ,0 ,0);
@@ -29,7 +30,7 @@ public class AdjTest {
         List<Integer> h = Arrays.asList(0, 0, 0, 0 ,0 ,0 ,0 ,1);
 
         List<List<Integer>> ans = Arrays.asList(a, b, d, e, f, g, h);
-        assertEquals(ans, Board.adjRows(exRow, exRow.length, 1));
+        assertEquals(ans, Board.adjCols(exRow, 1));
     }
 
     @Test

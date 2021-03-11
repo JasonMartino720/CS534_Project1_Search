@@ -8,9 +8,9 @@ public class testBoard {
 	public void test4By4() {
 		Board testBoard = new Board(ExampleBoards.exampleBoardOne, 4);
 		assertEquals(testBoard.countRowAttack(), 0);
-		assertEquals(testBoard.countDiagonalLeft(), 1);
-		assertEquals(testBoard.countDiagonalRight(), 0);
-		assertEquals(testBoard.heuristic(), 1);
+		assertEquals(testBoard.countDiagonalLeft(), 0);
+		assertEquals(testBoard.countDiagonalRight(), 6);
+		assertEquals(testBoard.heuristic(), 6);
 	}
 
 	@Test
