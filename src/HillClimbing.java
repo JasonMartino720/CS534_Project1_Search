@@ -2,17 +2,17 @@ import java.util.*;
 
 public class HillClimbing {
 
-    public static Random rand;
 
-    public static final int BoardSize = 16;
-    public static final int NumQueens = BoardSize * 9 / 8;
-    public static final int maxAllowableResets = 5;
-    public static double Tmp,StartingTmp = 10000;
-    public static final double TempDegradation = 0.5;
-    public static final double minAllowableTemp = 1;
+    public static final int BoardSize = 8;
+    public static final int NumQueens = BoardSize;
 
     public static Board currentBoard, refBoard, bestBoard;
     public static int currentCost, lowestCost, thisLowestCost, startingCost;
+
+    public static Set<Board> reachableBoards = new HashSet<>();
+    public static HashMap<Board, Integer> priorityQ = new HashMap<>();
+    public static HashMap<Board, Integer> costToReach = new HashMap<>();
+    public static HashMap<Board, Board> cameFrom = new HashMap<>();
 
     //Calculate Heuristic Cost of Given Board
     public static int calculateCost(Board board) {
@@ -20,48 +20,44 @@ public class HillClimbing {
         return ((board.findNumAttacks() * 100) + board.getAllMoveCost(refBoard));
     }
 
-    public static double simulatedAnnealing(int curSol, int newSol, double T){
-        return Math.exp((curSol-newSol)/T);
-    }
 
     public static Board nextBoard(Board board) {
+        Board returnThis = null;
         int boardCost = calculateCost(board);
+
         ArrayList<ArrayList<QueenEntry>> allMoves = board.allPossibleMoves();
 
-        //Create list of Queen IDs (1-N) and randomize it
-        List<Integer> QueenIDs = new ArrayList<Integer>();
-        for (int i = 1; i <= NumQueens; i++) {
-            QueenIDs.add(i);
-        }
-        Collections.shuffle(QueenIDs);
-
+        //if we have already seen board, dont take move
 
         //Iterate through shuffled queen list
-        for (int queenID : QueenIDs) {
-            ArrayList<QueenEntry> subsetMoves = allMoves.get(queenID); // -1 HERE Before
+        for (int i = 1; i <= NumQueens; i++) {
+            ArrayList<QueenEntry> subsetMoves = allMoves.get(i); // -1 HERE Before
 
-            //Iterate through all possible moves for "queenID-th" queen
-            for (QueenEntry i : subsetMoves) {
-                Board tmpBoard = board.moveAQueen(queenID, i);
-                //If this board represents a lower cost accept it, if not accept it with some probability
-                if (calculateCost(tmpBoard) < boardCost){
-                    //System.out.println("Found Better " + Tmp);
-                    Tmp *= TempDegradation;
-                    return tmpBoard;
-                }
-                else {
-                    if ((Math.random() < simulatedAnnealing(boardCost, calculateCost(tmpBoard), Tmp))&&(Tmp > minAllowableTemp)){
-                        //System.out.println("Took Backwards " + Tmp);
-                        Tmp *= TempDegradation;
-                        return tmpBoard;
-                    }
-                }
+            for (QueenEntry j : subsetMoves) {
+                Board tmpBoard = board.moveAQueen(i, j);
+                //If this board represents a lower cost accept it, if not dont add to queue
+                if(!reachableBoards.contains(tmpBoard)) {
+                    reachableBoards.add(tmpBoard);
+                    costToReach.put(tmpBoard, calculateCost(tmpBoard));
+                    priorityQ.put(tmpBoard, calculateCost(tmpBoard));
+                    cameFrom.put(tmpBoard, board);
 
+                } else if(costToReach.get(tmpBoard) > calculateCost(tmpBoard)) {
+                    reachableBoards.add(tmpBoard);
+                    costToReach.put(tmpBoard, calculateCost(tmpBoard));
+                    priorityQ.put(tmpBoard, calculateCost(tmpBoard));
+                    cameFrom.put(tmpBoard, board);
+                }
+            }
+            Integer min = Collections.min(priorityQ.values());
+            for(Board b : reachableBoards) {
+                if(costToReach.get(b).equals(min)) {
+                    priorityQ.remove(b, min);
+                    returnThis = b;
+                }
             }
         }
-        Tmp *= TempDegradation;
-        //null is returned if no better move was discovered
-        return null;
+        return returnThis;
     }
 
     public static void main(String[] args) {
@@ -76,31 +72,17 @@ public class HillClimbing {
 
         long start = System.nanoTime();
 
-        for(int i =0; i< maxAllowableResets; i++) {
+        while (true) {
+            if (nextBoard(currentBoard).findNumAttacks() != 0) {
+                //System.out.println(nextBoard(currentBoard));
+                currentBoard = nextBoard(currentBoard);
+            } else {
+                lowestCost = calculateCost(currentBoard);
 
-            while (true) {
-                if (nextBoard(currentBoard) != null) {
-                    System.out.println(nextBoard(currentBoard));
-                    currentBoard = nextBoard(currentBoard);
-                } else {
-                    thisLowestCost = calculateCost(currentBoard);
-
-                    break;
-                }
-            }
-
-            if(thisLowestCost < lowestCost){
-                lowestCost = thisLowestCost;
-                bestBoard = currentBoard;
-                System.out.println("New Lowest " + lowestCost);
-            }
-
-            if(i < maxAllowableResets){
-                //Reset if we're going to go through again
-                currentBoard = refBoard;
-                Tmp = StartingTmp;
+                break;
             }
         }
+
         long end = System.nanoTime();
         System.out.println("Final Board Cost: " + lowestCost);
         System.out.println("Elapsed Time in ms: " + ((end-start)/Math.pow(1,6)));
