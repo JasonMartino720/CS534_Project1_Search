@@ -65,45 +65,56 @@ public class HillClimbing {
     }
 
     public static void main(String[] args) {
+        double avgTime = 0, avgCost =0;
+        int numRuns = 500;
+        for(int runs = 0; runs < numRuns; runs++)
+        {
+            //First Choice Rn
+            refBoard = Board.ofRandomBoard(8, NumQueens);
+            currentBoard = refBoard;
+            currentCost = calculateCost(currentBoard);
+            startingCost = currentCost;
+            System.out.println("Starting Cost " + startingCost);
+            lowestCost = currentCost;
 
-        //First Choice Rn
-        refBoard = Board.ofRandomBoard(8, NumQueens);
-        currentBoard = refBoard;
-        currentCost = calculateCost(currentBoard);
-        startingCost = currentCost;
-        System.out.println("Starting Cost " + startingCost);
-        lowestCost = currentCost;
+            long start = System.nanoTime();
 
-        long start = System.nanoTime();
+            for(int i =0; i< maxAllowableResets; i++) {
 
-        for(int i =0; i< maxAllowableResets; i++) {
+                while (true) {
+                    if (nextBoard(currentBoard) != null) {
+                        System.out.println(nextBoard(currentBoard));
+                        currentBoard = nextBoard(currentBoard);
+                    } else {
+                        thisLowestCost = calculateCost(currentBoard);
 
-            while (true) {
-                if (nextBoard(currentBoard) != null) {
-                    System.out.println(nextBoard(currentBoard));
-                    currentBoard = nextBoard(currentBoard);
-                } else {
-                    thisLowestCost = calculateCost(currentBoard);
+                        break;
+                    }
+                }
 
-                    break;
+                if(thisLowestCost < lowestCost){
+                    lowestCost = thisLowestCost;
+                    bestBoard = currentBoard;
+                    System.out.println("New Lowest " + lowestCost);
+                }
+
+                if(i < maxAllowableResets){
+                    //Reset if we're going to go through again
+                    currentBoard = refBoard;
+                    Tmp = StartingTmp;
                 }
             }
+            long end = System.nanoTime();
+            double elapsedTime = ((end-start)/Math.pow(1,6));
+            System.out.println("Final Board Cost: " + lowestCost);
+            System.out.println("Elapsed Time in ms: " + elapsedTime);
 
-            if(thisLowestCost < lowestCost){
-                lowestCost = thisLowestCost;
-                bestBoard = currentBoard;
-                System.out.println("New Lowest " + lowestCost);
-            }
-
-            if(i < maxAllowableResets){
-                //Reset if we're going to go through again
-                currentBoard = refBoard;
-                Tmp = StartingTmp;
-            }
+            avgTime += elapsedTime;
+            avgCost += lowestCost;
         }
-        long end = System.nanoTime();
-        System.out.println("Final Board Cost: " + lowestCost);
-        System.out.println("Elapsed Time in ms: " + ((end-start)/Math.pow(1,6)));
-
+        avgCost = avgCost / numRuns;
+        avgTime = avgTime / numRuns;
+        System.out.println("Average Cost: " + avgCost);
+        System.out.println("Average Runtime: " + avgCost);
     }
 }
