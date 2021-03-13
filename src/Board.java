@@ -1,7 +1,5 @@
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -260,6 +258,26 @@ public class Board {
         return out;
     }
 
+    public Set<QueenEntry> findConflictingQueens() {
+        HashSet<QueenEntry> ans = new HashSet<>();
+        for(QueenEntry queenM : queens) {
+            if (queenM.equals(QueenEntry.of(0,0,-1))) continue; // for dummy queens[0].
+            for(QueenEntry queenN : queens) {
+                if (queenN.equals(QueenEntry.of(0,0,-1))) continue; // for dummy queens[0].
+                if (queenN.equals(queenM)) continue; // for queen hitting itself in list
+
+                if(queenM.col() == queenN.col() || queenM.row() == queenN.row()
+                 || queenM.col()-queenM.row()+size == queenN.col()-queenN.row()+size
+                        || queenM.col()+queenM.row() == queenN.col()+queenN.row()) {
+                    ans.add(queenM);
+                    ans.add(queenN);
+                }
+            }
+        }
+        return ans;
+    }
+
+
     @Override
     public String toString() {
         return "Board{" +
@@ -287,6 +305,7 @@ public class Board {
         System.out.println(moves.get(1).toString());
         Board newb = rb.moveAQueen(1, moves.get(1).get(1));
         System.out.println(newb);
+        System.out.println(b.findConflictingQueens().size());
     }
 
 }
