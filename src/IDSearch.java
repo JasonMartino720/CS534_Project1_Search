@@ -9,6 +9,7 @@ public class IDSearch {
         // loops through until a goal node is found
         for (int depth = 0; depth <= root.size; depth++) {
             Board found = DLS(root, depth);
+            System.out.println("Current depth: " + depth);
             if (found != null) {
             	System.out.println("Solution depth: " + depth);
             	return found;
